@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projects — Alex Mercer</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Syne', 'sans-serif'],
+            mono:    ['DM Mono', 'monospace'],
+            body:    ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #050b18;
+      --blue:     #3b82f6;
+      --blue-l:   #60a5fa;
+      --violet:   #8b5cf6;
+      --cyan:     #22d3ee;
+      --amber:    #f59e0b;
+      --rose:     #f43f5e;
+      --emerald:  #10b981;
+    }
+
+    body { background: var(--bg); font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+
+    /* ── Grid overlay ── */
+    .grid-bg::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,0.038) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.038) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(96,165,250,0.6);
+    }
+
+    /* ── Gradient heading ── */
+    .grad-text {
+      background: linear-gradient(120deg, #e2e8f0 0%, #93c5fd 35%, #fff 55%, #a78bfa 80%, #e2e8f0 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 6s linear infinite;
+    }
+    @keyframes shimmer { from{background-position:-200% center} to{background-position:200% center} }
+
+    /* ── Ambient blobs ── */
+    .blob {
+      position: absolute; border-radius: 50%;
+      filter: blur(110px); pointer-events: none;
+    }
+
+    /* ════════════════════════════════════════
+       PROJECT CARD
+    ════════════════════════════════════════ */
+    .project-card {
+      position: relative;
+      background: rgba(10, 20, 46, 0.6);
+      border: 1px solid rgba(96,165,250,0.1);
+      border-radius: 24px;
+      overflow: hidden;
+      cursor: pointer;
+      opacity: 0;
+      will-change: transform, box-shadow;
+      /* transition intentionally removed — Anime.js owns all motion */
+    }
+
+    /* ── Cinematic top gradient bar ── */
+    .card-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 24px 24px 0 0;
+      opacity: 0.8;
+    }
+
+    /* ── Noise grain overlay on card ── */
+    .card-noise::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.5;
+    }
+
+    /* ── Card inner ── */
+    .card-inner {
+      position: relative;
+      z-index: 1;
+      padding: 2rem 2rem 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      height: 100%;
+    }
+
+    /* ── Project number badge ── */
+    .proj-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(96,165,250,0.45);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .proj-num::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, rgba(96,165,250,0.2), transparent);
+    }
+
+    /* ── Icon box ── */
+    .proj-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      will-change: transform;
+    }
+
+    /* ── Title ── */
+    .proj-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.15rem, 2.5vw, 1.35rem);
+      color: #f1f5f9;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+    }
+
+    /* ── Description ── */
+    .proj-desc {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      color: rgba(148,163,184,0.85);
+      line-height: 1.7;
+      flex: 1;
+    }
+
+    /* ── Tech stack pills ── */
+    .tech-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: 99px;
+      border: 1px solid;
+      display: inline-block;
+      will-change: transform;
+    }
+
+    /* ── Card action row ── */
+    .card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      opacity: 0;
+      transform: translateY(8px);
+      /* revealed by Anime.js on hover */
+    }
+
+    .btn-action {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      border-radius: 99px;
+      border: 1px solid;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      will-change: transform;
+    }
+
+    /* ── Hover reveal panel ── */
+    .card-reveal {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      /* Anime.js animates height and opacity */
+    }
+
+    /* ── Floating particles inside card ── */
+    .card-particle {
+      position: absolute;
+      width: 2.5px; height: 2.5px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    /* ── Corner brackets ── */
+    .cbr-tl { position:absolute; top:16px; left:16px; width:18px; height:18px; border-top:1px solid rgba(96,165,250,0.18); border-left:1px solid rgba(96,165,250,0.18); border-radius: 3px 0 0 0; pointer-events:none; }
+    .cbr-br { position:absolute; bottom:16px; right:16px; width:18px; height:18px; border-bottom:1px solid rgba(96,165,250,0.18); border-right:1px solid rgba(96,165,250,0.18); border-radius: 0 0 3px 0; pointer-events:none; }
+
+    /* ── Spotlight glow (follows cursor inside card) ── */
+    .card-spotlight {
+      position: absolute;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      filter: blur(60px);
+      z-index: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* ── Status chip ── */
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 99px;
+    }
+
+    /* ── Header line ── */
+    #proj-header-line { flex: 1; height: 1px; width: 0; }
+
+    /* ── Heading spans ── */
+    #proj-heading span { display: block; opacity: 0; transform: translateY(20px); }
+
+    /* ── Section header initial ── */
+    #proj-header { opacity: 0; }
+    #proj-sub    { opacity: 0; transform: translateY(14px); }
+
+    /* ── Filter tabs ── */
+    .filter-tab {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 6px 18px;
+      border-radius: 99px;
+      border: 1px solid rgba(96,165,250,0.16);
+      background: rgba(13,28,58,0.5);
+      color: rgba(148,163,184,0.65);
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(10px) scale(0.88);
+    }
+    .filter-tab.active {
+      background: rgba(59,130,246,0.14);
+      border-color: rgba(96,165,250,0.4);
+      color: #93c5fd;
+    }
+
+    /* ── Section corners ── */
+    .s-corner { position:absolute; width:32px; height:32px; opacity:0.45; }
+    .s-corner-tl { top:2rem; left:2rem; border-top:1px solid rgba(96,165,250,0.3); border-left:1px solid rgba(96,165,250,0.3); }
+    .s-corner-tr { top:2rem; right:2rem; border-top:1px solid rgba(96,165,250,0.3); border-right:1px solid rgba(96,165,250,0.3); }
+    .s-corner-bl { bottom:2rem; left:2rem; border-bottom:1px solid rgba(96,165,250,0.3); border-left:1px solid rgba(96,165,250,0.3); }
+    .s-corner-br { bottom:2rem; right:2rem; border-bottom:1px solid rgba(96,165,250,0.3); border-right:1px solid rgba(96,165,250,0.3); }
+
+    /* ── CTA ── */
+    #proj-cta { opacity: 0; transform: translateY(16px); }
+
+    /* ════ NEW: Glowing border sweep on cards ════ */
+
+    /* Each card gets a pseudo-element border that sweeps around on entrance */
+    .project-card {
+      --glow-alpha: 0;        /* animated by Anime.js via CSS var trick (opacity on ::after) */
+    }
+
+    /* Animated gradient border overlay — sits on top of card edge */
+    .card-border-glow {
+      position: absolute;
+      inset: -1px;
+      border-radius: 25px;
+      padding: 1px;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0;
+      background: conic-gradient(
+        from var(--angle, 0deg),
+        transparent 20%,
+        var(--card-accent, rgba(96,165,250,0.8)) 40%,
+        rgba(255,255,255,0.9) 50%,
+        var(--card-accent, rgba(96,165,250,0.8)) 60%,
+        transparent 80%
+      );
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+
+    @keyframes borderSweep {
+      from { --angle: 0deg; }
+      to   { --angle: 360deg; }
+    }
+    @property --angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    /* Idle border pulse — glows softly between interactions */
+    @keyframes idlePulse {
+      0%,100% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0px rgba(96,165,250,0); }
+      50%     { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 18px rgba(96,165,250,0.08); }
+    }
+
+    /* Per-card accent colour for border glow */
+    .project-card[data-index="0"] .card-border-glow { --card-accent: rgba(245,158,11,0.9); }
+    .project-card[data-index="1"] .card-border-glow { --card-accent: rgba(59,130,246,0.9);  }
+    .project-card[data-index="2"] .card-border-glow { --card-accent: rgba(16,185,129,0.9);  }
+
+    /* Sub-element initial states for new stagger animations */
+    .proj-num    { opacity: 0; transform: translateX(-12px); }
+    .proj-icon   { opacity: 0; transform: scale(0.5) rotate(-12deg); }
+    .proj-title  { opacity: 0; transform: translateY(14px); }
+    .proj-desc   { opacity: 0; transform: translateY(10px); }
+    .tech-pill   { opacity: 0; transform: translateX(-10px) scale(0.8); }
+    .cbr-tl, .cbr-br { opacity: 0; transform: scale(0.3); }
+
+    /* Card actions stay hidden until hover */
+    .card-actions { opacity: 0; transform: translateY(8px); }
+
+    /* Idle animation class added by JS after entrance */
+    .card-idle { animation: idlePulse 4s ease-in-out infinite; }
+  </style>
+</head>
+
+<body class="bg-[#050b18]">
+<section id="projects" class="relative overflow-hidden grid-bg py-28 lg:py-36">
+
+  <!-- Ambient blobs -->
+  <div class="blob w-[500px] h-[500px]" style="background:rgba(59,130,246,0.09);  top:-8%;    left:-5%;"></div>
+  <div class="blob w-[400px] h-[400px]" style="background:rgba(139,92,246,0.10); bottom:-6%; right:-4%;"></div>
+  <div class="blob w-[280px] h-[280px]" style="background:rgba(16,185,129,0.07);  top:40%;    left:55%;"></div>
+
+  <!-- Section corners -->
+  <div class="s-corner s-corner-tl"></div>
+  <div class="s-corner s-corner-tr"></div>
+  <div class="s-corner s-corner-bl"></div>
+  <div class="s-corner s-corner-br"></div>
+
+  <div class="relative z-10 max-w-6xl mx-auto px-6 sm:px-10 lg:px-16">
+
+    <!-- ══ HEADER ══ -->
+    <div id="proj-header" class="mb-14 lg:mb-16">
+      <div class="flex items-center gap-4 mb-5">
+        <span class="section-label">04 / Projects</span>
+        <div id="proj-header-line" class="bg-gradient-to-r from-blue-500/30 to-transparent"></div>
+      </div>
+
+      <h2 id="proj-heading" class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.08] mb-5">
+        <span class="grad-text">Things I've</span>
+        <span class="text-slate-300">shipped.</span>
+      </h2>
+
+      <p id="proj-sub" class="font-body text-slate-400 text-base sm:text-lg max-w-xl leading-relaxed">
+        Real products built with care — from full-stack web apps to data-driven platforms. Each one a chance to push further.
+      </p>
+    </div>
+
+    <!-- ══ FILTER TABS ══ -->
+    <div id="proj-filters" class="flex flex-wrap gap-2 mb-10" style="opacity:0;">
+      <button class="filter-tab active" data-filter="all">All Projects</button>
+      <button class="filter-tab" data-filter="fullstack">Full Stack</button>
+      <button class="filter-tab" data-filter="frontend">Frontend</button>
+      <button class="filter-tab" data-filter="backend">Backend</button>
+    </div>
+
+    <!-- ══ CARDS GRID ══ -->
+    <div id="proj-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-14">
+
+      <!-- ═══════════════════════════════════
+           CARD 1 — Cinnamon E-commerce
+      ═══════════════════════════════════ -->
+      <div class="project-card card-noise" data-filter="fullstack" data-index="0">
+        <!-- Animated border glow sweep -->
+        <div class="card-border-glow"></div>
+
+        <!-- Top colour bar -->
+        <div class="card-bar" style="background:linear-gradient(90deg,#f59e0b,#ef4444,#f59e0b); background-size:200% auto; animation:shimmer 3s linear infinite;"></div>
+
+        <!-- Spotlight glow -->
+        <div class="card-spotlight" style="background:radial-gradient(circle, rgba(245,158,11,0.18), transparent 70%);"></div>
+
+        <!-- Corner brackets -->
+        <div class="cbr-tl"></div>
+        <div class="cbr-br"></div>
+
+        <!-- Particles -->
+        <div class="card-particle" style="top:20%; left:85%; background:#f59e0b;"></div>
+        <div class="card-particle" style="top:65%; left:10%; background:#ef4444;"></div>
+        <div class="card-particle" style="top:45%; left:90%; background:#fbbf24;"></div>
+
+        <div class="card-inner">
+          <!-- Number -->
+          <div class="proj-num">Project 01</div>
+
+          <!-- Icon + Title row -->
+          <div class="flex items-start gap-4">
+            <div class="proj-icon" style="background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.25);">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+              </svg>
+            </div>
+            <div>
+              <div class="proj-title">Cinnamon<br>E-Commerce</div>
+              <div class="status-chip mt-1.5" style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.22); color:rgba(245,158,11,0.85);">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" style="box-shadow:0 0 5px rgba(245,158,11,0.8);"></span>
+                Live
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <p class="proj-desc">
+            A full-featured online store for a local spice brand — product catalogue, cart, checkout flow, and admin dashboard. Built with a focus on mobile-first UX and fast load times.
+          </p>
+
+          <!-- Reveal panel (hover) -->
+          <div class="card-reveal">
+            <div class="rounded-xl p-3.5 mb-3" style="background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.14);">
+              <div class="section-label mb-2" style="color:rgba(245,158,11,0.6);">Highlights</div>
+              <ul class="space-y-1.5">
+                <li class="font-body text-xs text-slate-400 flex items-start gap-2"><span class="text-amber-500 mt-0.5">▸</span>Product search with real-time filters</li>
+                <li class="font-body text-xs text-slate-400 flex items-start gap-2"><span class="text-amber-500 mt-0.5">▸</span>Secure checkout with session cart</li>
+                <li class="font-body text-xs text-slate-400 flex items-start gap-2"><span class="text-amber-500 mt-0.5">▸</span>Admin panel for inventory & orders</li>
+                <li class="font-body text-xs text-slate-400 flex items-start gap-2"><span class="text-amber-500 mt-0.5">▸</span>Responsive across all screen sizes</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Tech stack -->
+          <div class="flex flex-wrap gap-1.5">
+            <span class="tech-pill" style="color:#f59e0b; border-color:rgba(245,158,11,0.25); background:rgba(245,158,11,0.07);">PHP</span>
+            <span class="tech-pill" style="color:#f59e0b; border-color:rgba(245,158,11,0.25); background:rgba(245,158,11,0.07);">MySQL</span>
+            <span class="tech-pill" style="color:#f59e0b; border-color:rgba(245,158,11,0.25); background:rgba(245,158,11,0.07);">JavaScript</span>
+            <span class="tech-pill" style="color:#f59e0b; border-color:rgba(245,158,11,0.25); background:rgba(245,158,11,0.07);">Tailwind CSS</span>
+            <span class="tech-pill" style="color:#f59e0b; border-color:rgba(245,158,11,0.25); background:rgba(245,158,11,0.07);">HTML/CSS</span>
+          </div>
+
+          <!-- Action row (hover reveal) -->
+          <div class="card-actions">
+            <div class="flex gap-2">
+              <button class="btn-action" style="background:rgba(245,158,11,0.12); border-color:rgba(245,158,11,0.3); color:#f59e0b;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                Live Demo
+              </button>
+              <button class="btn-action" style="background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.1); color:rgba(148,163,184,0.8);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                GitHub
+              </button>
+            </div>
+            <span class="font-mono text-[10px] text-slate-600">Full Stack</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════
+           CARD 2 — LMS System
+      ═══════════════════════════════════ -->
+      <div class="project-card card-noise" data-filter="fullstack" data-index="1">
+        <div class="card-border-glow"></div>
+        <div class="card-bar" style="background:linear-gradient(90deg,#3b82f6,#8b5cf6,#3b82f6); background-size:200% auto; animation:shimmer 3.5s linear infinite;"></div>
+        <div class="card-spotlight" style="background:radial-gradient(circle, rgba(59,130,246,0.18), transparent 70%);"></div>
+        <div class="cbr-tl"></div>
+        <div class="cbr-br"></div>
+        <div class="card-particle" style="top:18%; left:82%; background:#3b82f6;"></div>
+        <div class="card-particle" style="top:70%; left:12%; background:#8b5cf6;"></div>
+        <div class="card-particle" style="top:40%; left:88%; background:#60a5fa;"></div>
+
+        <div class="card-inner">
+          <div class="proj-num">Project 02</div>
+
+          <div class="flex items-start gap-4">
+            <div class="proj-icon" style="background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.25);">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="proj-title">LMS<br>Platform</div>
+              <div class="status-chip mt-1.5" style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25); color:rgba(96,165,250,0.9);">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" style="box-shadow:0 0 5px rgba(59,130,246,0.8);"></span>
+                In Review
+              </div>
+            </div>
+          </div>
+
+          <p class="proj-desc">
+            A Learning Management System for academic institutions — course creation, student enrolment, assignment submission, grading, and real-time progress tracking in one platform.
+          </p>
+
+          <div class="card-reveal">
+            <div class="rounded-xl p-3.5 mb-3" style="background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.14);">
+              <div class="section-label mb-2" style="color:rgba(96,165,250,0.6);">Highlights</div>
+              <ul class="space-y-1.5">
+                <li class="font-body text-xs text-slate-400 flex items-start gap-2"><span class="text-blue-400 mt-0.5">▸</span>Role-based access: Admin, Teacher, Student</li>
+                <li class="font-body text-xs text-slate-400 flex items-start gap-2"><span class="text-blue-400 mt-0.5">▸</span>Assignment upload & automated grading</li>
+                <li class="font-body text-xs text-slate-400 flex items-start gap-2"><span class="text-blue-400 mt-0.5">▸</span>Progress dashboards with visual analytics</li>
+                <li class="font-body text-xs text-slate-400 flex items-start gap-2"><span class="text-blue-400 mt-0.5">▸</span>Notification system for deadlines</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-1.5">
+            <span class="tech-pill" style="color:#60a5fa; border-color:rgba(59,130,246,0.25); background:rgba(59,130,246,0.07);">Java</span>
+            <span class="tech-pill" style="color:#60a5fa; border-color:rgba(59,130,246,0.25); background:rgba(59,130,246,0.07);">PHP</span>
+            <span class="tech-pill" style="color:#60a5fa; border-color:rgba(59,130,246,0.25); background:rgba(59,130,246,0.07);">MySQL</span>
+            <span class="tech-pill" style="color:#60a5fa; border-color:rgba(59,130,246,0.25); background:rgba(59,130,246,0.07);">JavaScript</span>
+            <span class="tech-pill" style="color:#60a5fa; border-color:rgba(59,130,246,0.25); background:rgba(59,130,246,0.07);">Tailwind CSS</span>
+          </div>
+
+          <div class="card-actions">
+            <div class="flex gap-2">
+              <button class="btn-action" style="background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.3); color:#60a5fa;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                Live Demo
+              </button>
+              <button class="btn-action" style="background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.1); color:rgba(148,163,184,0.8);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                GitHub
+              </button>
+            </div>
+            <span class="font-mono text-[10px] text-slate-600">Full Stack</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════
+           CARD 3 — Movie Reservation
+      ═══════════════════════════════════ -->
+      <div class="project-card card-noise" data-filter="fullstack" data-index="2">
+        <div class="card-border-glow"></div>
+        <div class="card-bar" style="background:linear-gradient(90deg,#10b981,#22d3ee,#10b981); background-size:200% auto; animation:shimmer 4s linear infinite;"></div>
+        <div class="card-spotlight" style="background:radial-gradient(circle, rgba(16,185,129,0.18), transparent 70%);"></div>
+        <div class="cbr-tl"></div>
+        <div class="cbr-br"></div>
+        <div class="card-particle" style="top:22%; left:84%; background:#10b981;"></div>
+        <div class="card-particle" style="top:68%; left:9%; background:#22d3ee;"></div>
+        <div class="card-particle" style="top:42%; left:91%; background:#34d399;"></div>
+
+        <div class="card-inner">
+          <div class="proj-num">Project 03</div>
+
+          <div class="flex items-start gap-4">
+            <div class="proj-icon" style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.25);">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="2.18"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M17 7h5M2 17h5M17 17h5"/>
+              </svg>
+            </div>
+            <div>
+              <div class="proj-title">Movie<br>Reservation</div>
+              <div class="status-chip mt-1.5" style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); color:rgba(52,211,153,0.9);">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" style="box-shadow:0 0 5px rgba(16,185,129,0.8);"></span>
+                Completed
+              </div>
+            </div>
+          </div>
+
+          <p class="proj-desc">
+            A cinema seat reservation system with an interactive seat map, show time scheduling, and user booking history. Designed to handle concurrent reservations gracefully.
+          </p>
+
+          <div class="card-reveal">
+            <div class="rounded-xl p-3.5 mb-3" style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.14);">
+              <div class="section-label mb-2" style="color:rgba(52,211,153,0.6);">Highlights</div>
+              <ul class="space-y-1.5">
+                <li class="font-body text-xs text-slate-400 flex items-start gap-2"><span class="text-emerald-400 mt-0.5">▸</span>Visual interactive seat map UI</li>
+                <li class="font-body text-xs text-slate-400 flex items-start gap-2"><span class="text-emerald-400 mt-0.5">▸</span>Real-time seat lock to prevent double booking</li>
+                <li class="font-body text-xs text-slate-400 flex items-start gap-2"><span class="text-emerald-400 mt-0.5">▸</span>Movie schedule & showtime management</li>
+                <li class="font-body text-xs text-slate-400 flex items-start gap-2"><span class="text-emerald-400 mt-0.5">▸</span>Booking confirmation & ticket generation</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-1.5">
+            <span class="tech-pill" style="color:#10b981; border-color:rgba(16,185,129,0.25); background:rgba(16,185,129,0.07);">Java</span>
+            <span class="tech-pill" style="color:#10b981; border-color:rgba(16,185,129,0.25); background:rgba(16,185,129,0.07);">PHP</span>
+            <span class="tech-pill" style="color:#10b981; border-color:rgba(16,185,129,0.25); background:rgba(16,185,129,0.07);">MySQL</span>
+            <span class="tech-pill" style="color:#10b981; border-color:rgba(16,185,129,0.25); background:rgba(16,185,129,0.07);">HTML/CSS</span>
+            <span class="tech-pill" style="color:#10b981; border-color:rgba(16,185,129,0.25); background:rgba(16,185,129,0.07);">JavaScript</span>
+          </div>
+
+          <div class="card-actions">
+            <div class="flex gap-2">
+              <button class="btn-action" style="background:rgba(16,185,129,0.12); border-color:rgba(16,185,129,0.3); color:#10b981;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                Live Demo
+              </button>
+              <button class="btn-action" style="background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.1); color:rgba(148,163,184,0.8);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                GitHub
+              </button>
+            </div>
+            <span class="font-mono text-[10px] text-slate-600">Full Stack</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /grid -->
+
+    <!-- ══ CTA ══ -->
+    <div id="proj-cta" class="flex flex-col sm:flex-row items-center justify-between gap-6 p-6 rounded-2xl"
+         style="background:rgba(13,28,58,0.5); border:1px solid rgba(96,165,250,0.12);">
+      <div>
+        <div class="font-display font-bold text-white text-lg mb-1">Want to see more?</div>
+        <div class="font-body text-slate-400 text-sm">All projects are open-source and available on GitHub.</div>
+      </div>
+      <button id="cta-github" class="shrink-0 flex items-center gap-2.5 px-6 py-3 rounded-xl font-display font-semibold text-sm text-white"
+              style="background:linear-gradient(135deg,#3b82f6,#6d28d9); border:1px solid rgba(96,165,250,0.4); box-shadow:0 0 20px rgba(59,130,246,0.25);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        View All on GitHub
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     ANIME.JS — UPGRADED ANIMATION SYSTEM
+═══════════════════════════════════════════════════ -->
+<script>
+/* ─── Easing constants ─── */
+const E  = 'cubicBezier(0.16,1,0.3,1)';
+const EB = 'easeOutBack';
+const ES = 'easeOutElastic(1,0.55)';
+const EQ = 'easeOutQuart';
+
+/* ─── Per-card accent colours ─── */
+const ACCENTS = ['#f59e0b', '#3b82f6', '#10b981'];
+
+/* ─── hex → rgba ─── */
+function ha(hex, a) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/* ─── IntersectionObserver helper ─── */
+function onVisible(el, cb, threshold = 0.1) {
+  if (!el) return;
+  new IntersectionObserver((entries, obs) => {
+    entries.forEach(e => { if (e.isIntersecting) { cb(); obs.disconnect(); } });
+  }, { threshold }).observe(el);
+}
+
+/* ══════════════════════════════════════════════════
+   1. BLOB FLOAT LOOPS
+══════════════════════════════════════════════════ */
+[
+  { tx:40,  ty:-28, sc:1.07, dur:13000, delay:0    },
+  { tx:-32, ty: 22, sc:1.08, dur: 9800, delay:2200 },
+  { tx: 20, ty:-16, sc:1.05, dur: 8400, delay:4000 },
+].forEach((c, i) => {
+  const b = document.querySelectorAll('.blob')[i];
+  if (!b) return;
+  anime({ targets:b,
+    translateX:[0,c.tx,-c.tx*0.4,0],
+    translateY:[0,c.ty,-c.ty*0.55,0],
+    scale:[1,c.sc,0.96,1],
+    duration:c.dur, delay:c.delay,
+    loop:true, direction:'alternate', easing:'easeInOutSine' });
+});
+
+/* ══════════════════════════════════════════════════
+   2. HEADER — fully choreographed entrance timeline
+══════════════════════════════════════════════════ */
+onVisible(document.getElementById('proj-header'), () => {
+  const tl = anime.timeline({ autoplay: true });
+
+  /* Whole header fades up */
+  tl.add({ targets:'#proj-header',
+    opacity:[0,1], translateY:[32,0],
+    duration:720, easing:E }, 0);
+
+  /* Divider line draws right */
+  tl.add({ targets:'#proj-header-line',
+    width:['0%','100%'], opacity:[0,1],
+    duration:960, easing:EQ }, 200);
+
+  /* Heading words stagger up */
+  tl.add({ targets:'#proj-heading span',
+    opacity:[0,1], translateY:[28,0],
+    duration:700, delay:anime.stagger(120), easing:E }, 160);
+
+  /* Subtitle */
+  tl.add({ targets:'#proj-sub',
+    opacity:[0,1], translateY:[16,0],
+    duration:620, easing:E }, 520);
+
+  /* Filter tabs pop in staggered */
+  tl.add({ targets:'#proj-filters .filter-tab',
+    opacity:[0,1], translateY:[12,0], scale:[0.88,1],
+    duration:460, delay:anime.stagger(70), easing:EB }, 700);
+
+}, 0.05);
+
+/* ══════════════════════════════════════════════════
+   3. STAGGERED CARD REVEAL — the centrepiece
+   Each card: fly-in → inner elements cascade →
+   border sweep glow → idle pulse begins
+══════════════════════════════════════════════════ */
+onVisible(document.getElementById('proj-grid'), () => {
+
+  /* ── 3a. Cards stagger in from below ── */
+  anime({
+    targets: '.project-card',
+    opacity:    [0, 1],
+    translateY: [70, 0],
+    scale:      [0.85, 1],
+    rotateX:    [10, 0],
+    duration:   860,
+    delay:      anime.stagger(160, { start: 60 }),
+    easing:     E,
+    complete() {
+      /* After cards are in: start idle border pulse */
+      document.querySelectorAll('.project-card').forEach(c => c.classList.add('card-idle'));
+    }
+  });
+
+  /* ── 3b. Inside each card — deep sub-element stagger ── */
+  document.querySelectorAll('.project-card').forEach((card, ci) => {
+    const base = 60 + ci * 160 + 260;  // synced with card entrance delay
+
+    /* Corner brackets snap in */
+    anime({ targets: card.querySelectorAll('.cbr-tl, .cbr-br'),
+      opacity:[0,1], scale:[0.3,1],
+      duration:380, delay:anime.stagger(80, {start: base + 80}), easing:EB });
+
+    /* Number label slides from left */
+    anime({ targets: card.querySelector('.proj-num'),
+      opacity:[0,1], translateX:[-16,0],
+      duration:500, delay:base + 120, easing:E });
+
+    /* Icon pops in with spring */
+    anime({ targets: card.querySelector('.proj-icon'),
+      opacity:[0,1], scale:[0.4,1], rotate:[-15,0],
+      duration:640, delay:base + 180, easing:EB });
+
+    /* Title slides up */
+    anime({ targets: card.querySelector('.proj-title'),
+      opacity:[0,1], translateY:[16,0],
+      duration:520, delay:base + 280, easing:E });
+
+    /* Description fades up */
+    anime({ targets: card.querySelector('.proj-desc'),
+      opacity:[0,1], translateY:[12,0],
+      duration:500, delay:base + 380, easing:E });
+
+    /* Tech pills cascade left-to-right */
+    anime({ targets: card.querySelectorAll('.tech-pill'),
+      opacity:[0,1], translateX:[-12,0], scale:[0.8,1],
+      duration:380, delay:anime.stagger(52, {start: base + 480}), easing:E });
+  });
+
+  /* ── 3c. Border sweep glow on each card entrance ── */
+  document.querySelectorAll('.project-card').forEach((card, ci) => {
+    const glow = card.querySelector('.card-border-glow');
+    if (!glow) return;
+
+    setTimeout(() => {
+      /* Flash the border glow in, sweep once, then fade to low opacity */
+      const sweepAnim = anime({
+        targets: glow,
+        opacity: [0, 1, 0.18],
+        duration: 1400,
+        easing: EQ,
+      });
+
+      /* Trigger CSS conic sweep for one revolution */
+      glow.style.animation = 'borderSweep 1.2s linear forwards';
+      setTimeout(() => {
+        glow.style.animation = '';
+        glow.style.opacity   = '0.12';
+      }, 1400);
+
+    }, 60 + ci * 160 + 700);
+  });
+
+  /* ── 3d. Particles start ── */
+  setTimeout(startParticles, 1100);
+
+  /* ── 3e. CTA fades in last ── */
+  setTimeout(() => {
+    anime({ targets:'#proj-cta',
+      opacity:[0,1], translateY:[18,0],
+      duration:660, easing:E });
+  }, 1300);
+
+}, 0.08);
+
+/* ══════════════════════════════════════════════════
+   4. PARTICLE LOOPS
+══════════════════════════════════════════════════ */
+function startParticles() {
+  document.querySelectorAll('.project-card').forEach(card => {
+    card.querySelectorAll('.card-particle').forEach((p, i) => {
+      anime({
+        targets: p,
+        opacity:    [0, 0.9, 0],
+        translateY: [0, -(26 + i * 11), -(48 + i * 14)],
+        translateX: [0, i%2===0 ? 9:-9, i%2===0 ? 16:-16],
+        scale:      [0, 1.5, 0],
+        duration:   2800 + i * 900,
+        delay:      i * 520,
+        loop:       true,
+        easing:     'easeInOutSine',
+      });
+    });
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   5. CARD HOVER — lift + multi-layer glow border +
+      reveal panel + tilt parallax
+══════════════════════════════════════════════════ */
+document.querySelectorAll('.project-card').forEach((card, ci) => {
+  const accent    = ACCENTS[ci] || '#60a5fa';
+  const aHi       = ha(accent, 0.35);
+  const aMid      = ha(accent, 0.18);
+  const aBorder   = ha(accent, 0.55);
+  const reveal    = card.querySelector('.card-reveal');
+  const actions   = card.querySelector('.card-actions');
+  const icon      = card.querySelector('.proj-icon');
+  const spotlight = card.querySelector('.card-spotlight');
+  const brackets  = card.querySelectorAll('.cbr-tl, .cbr-br');
+  const pills     = card.querySelectorAll('.tech-pill');
+  const borderGlow= card.querySelector('.card-border-glow');
+  let hovered     = false;
+  let tiltAnim    = null;
+
+  /* ── Spotlight cursor tracking ── */
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const mx   = e.clientX - rect.left;
+    const my   = e.clientY - rect.top;
+
+    if (spotlight) {
+      spotlight.style.left = mx + 'px';
+      spotlight.style.top  = my + 'px';
+    }
+
+    /* 3-D tilt parallax */
+    const x = (mx / rect.width  - 0.5) * 10;
+    const y = (my / rect.height - 0.5) * 10;
+    if (tiltAnim) tiltAnim.pause();
+    tiltAnim = anime({
+      targets: card,
+      rotateY: x, rotateX: -y,
+      duration: 200, easing: 'easeOutQuad',
+    });
+  });
+
+  card.addEventListener('mouseenter', () => {
+    if (hovered) return;
+    hovered = true;
+    card.classList.remove('card-idle');   // pause idle pulse
+    card.style.transformStyle = 'preserve-3d';
+
+    /* Spotlight fades in */
+    if (spotlight) anime({ targets:spotlight, opacity:[0,1], duration:380, easing:'easeOutQuad' });
+
+    /* ── HOVER LIFT with layered glow box-shadow ── */
+    anime({ targets: card,
+      translateY: -14,
+      scale: 1.028,
+      boxShadow: [
+        '0 4px 20px rgba(0,0,0,0.3)',
+        `0 28px 70px rgba(0,0,0,0.45), 0 0 0 1px ${aBorder}, 0 0 50px ${aMid}, inset 0 1px 0 rgba(255,255,255,0.08)`
+      ],
+      borderColor: aBorder,
+      duration: 380, easing: EB });
+
+    /* ── GLOWING BORDER — border-glow element brightens ── */
+    if (borderGlow) {
+      borderGlow.style.animation = 'borderSweep 3s linear infinite';
+      anime({ targets: borderGlow, opacity:[null, 0.7], duration:400, easing:EQ });
+    }
+
+    /* Brackets light up */
+    anime({ targets:brackets,
+      borderColor: ha(accent, 0.75), scale:1.05,
+      duration:300, easing:EB });
+
+    /* Icon spring-bounces */
+    if (icon) anime({ targets:icon,
+      scale:1.22, rotate:[0,10,-5,0],
+      duration:500, easing:EB });
+
+    /* Pills brighten + lift staggered */
+    anime({ targets:pills,
+      opacity:1, scale:1.08, translateY:-2,
+      duration:300, delay:anime.stagger(38), easing:EB });
+
+    /* Title and desc subtle lift */
+    anime({ targets:[card.querySelector('.proj-title'), card.querySelector('.proj-desc')],
+      translateY:[null,-3],
+      duration:340, delay:anime.stagger(60), easing:E });
+
+    /* Reveal panel slides down */
+    if (reveal) {
+      anime({ targets:reveal,
+        maxHeight:['0px','240px'], opacity:[0,1],
+        duration:500, easing:EQ });
+    }
+
+    /* Action row fades up */
+    if (actions) {
+      anime({ targets:actions,
+        opacity:[0,1], translateY:[10,0],
+        duration:420, delay:220, easing:E });
+    }
+  });
+
+  card.addEventListener('mouseleave', () => {
+    if (!hovered) return;
+    hovered = false;
+
+    /* Spotlight fades out */
+    if (spotlight) anime({ targets:spotlight, opacity:0, duration:280, easing:'easeOutQuad' });
+
+    /* Reset tilt */
+    if (tiltAnim) tiltAnim.pause();
+    anime({ targets:card, rotateX:0, rotateY:0, duration:600, easing:ES });
+
+    /* ── SETTLE with elastic bounce ── */
+    anime({ targets:card,
+      translateY:0, scale:1,
+      boxShadow:'0 4px 20px rgba(0,0,0,0.3)',
+      borderColor:'rgba(96,165,250,0.1)',
+      duration:560, easing:ES });
+
+    /* Border glow dims back to idle */
+    if (borderGlow) {
+      anime({ targets:borderGlow, opacity:[null,0.12], duration:500, easing:EQ,
+        complete() {
+          borderGlow.style.animation = '';
+          borderGlow.style.opacity   = '0.12';
+        }
+      });
+    }
+
+    /* Brackets dim */
+    anime({ targets:brackets,
+      borderColor:'rgba(96,165,250,0.18)', scale:1,
+      duration:440, easing:'easeOutQuad' });
+
+    /* Icon resets */
+    if (icon) anime({ targets:icon, scale:1, rotate:0, duration:540, easing:ES });
+
+    /* Pills dim + reset */
+    anime({ targets:pills,
+      opacity:0.75, scale:1, translateY:0,
+      duration:380, delay:anime.stagger(28), easing:'easeOutQuad' });
+
+    /* Title/desc return */
+    anime({ targets:[card.querySelector('.proj-title'), card.querySelector('.proj-desc')],
+      translateY:0, duration:380, easing:'easeOutQuad' });
+
+    /* Panel collapses */
+    if (reveal) {
+      anime({ targets:reveal,
+        maxHeight:'0px', opacity:0,
+        duration:400, easing:EQ });
+    }
+
+    /* Actions hide */
+    if (actions) {
+      anime({ targets:actions,
+        opacity:0, translateY:8,
+        duration:300, easing:'easeOutQuad' });
+    }
+
+    /* Resume idle pulse */
+    setTimeout(() => card.classList.add('card-idle'), 560);
+  });
+
+  /* ── Press feedback ── */
+  card.addEventListener('mousedown', () =>
+    anime({ targets:card, scale:0.972, translateY:-7, duration:110, easing:'easeOutQuad' }));
+  card.addEventListener('mouseup', () =>
+    anime({ targets:card, scale:1.028, translateY:-14, duration:220, easing:EB }));
+});
+
+/* ══════════════════════════════════════════════════
+   6. ACTION BUTTON HOVER
+══════════════════════════════════════════════════ */
+document.querySelectorAll('.btn-action').forEach(btn => {
+  btn.addEventListener('mouseenter', () =>
+    anime({ targets:btn, scale:1.07, translateY:-3,
+      boxShadow:'0 6px 20px rgba(0,0,0,0.3)',
+      duration:230, easing:EB }));
+  btn.addEventListener('mouseleave', () =>
+    anime({ targets:btn, scale:1, translateY:0,
+      boxShadow:'0 0 0 rgba(0,0,0,0)',
+      duration:360, easing:ES }));
+  btn.addEventListener('click', e => e.stopPropagation());
+});
+
+/* ══════════════════════════════════════════════════
+   7. FILTER TABS — click flash + filter transition
+══════════════════════════════════════════════════ */
+document.querySelectorAll('.filter-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    /* Active flash */
+    anime({ targets:tab, scale:[1,1.12,1], duration:340, easing:EB });
+
+    const f = tab.dataset.filter;
+    document.querySelectorAll('.project-card').forEach((card, i) => {
+      const show = f === 'all' || card.dataset.filter === f;
+      card.style.pointerEvents = show ? 'auto' : 'none';
+      anime({ targets:card,
+        opacity:[null, show ? 1 : 0.1],
+        scale:[null,   show ? 1 : 0.93],
+        translateY:[null, show ? 0 : 12],
+        duration: show ? 460 : 300,
+        delay:    show ? i * 70 : 0,
+        easing:   show ? E : 'easeOutQuad' });
+    });
+  });
+
+  tab.addEventListener('mouseenter', () =>
+    anime({ targets:tab, scale:1.07, duration:230, easing:EB }));
+  tab.addEventListener('mouseleave', () =>
+    anime({ targets:tab, scale:1,    duration:360, easing:ES }));
+});
+
+/* ══════════════════════════════════════════════════
+   8. CTA BUTTON — magnetic hover + glow
+══════════════════════════════════════════════════ */
+const ctaBtn = document.getElementById('cta-github');
+if (ctaBtn) {
+  ctaBtn.addEventListener('mousemove', e => {
+    const r  = ctaBtn.getBoundingClientRect();
+    const mx = (e.clientX - r.left - r.width  / 2) * 0.2;
+    const my = (e.clientY - r.top  - r.height / 2) * 0.2;
+    anime({ targets:ctaBtn, translateX:mx, translateY:my - 3,
+      duration:200, easing:'easeOutQuad' });
+  });
+  ctaBtn.addEventListener('mouseenter', () =>
+    anime({ targets:ctaBtn, scale:1.05,
+      boxShadow:'0 0 40px rgba(59,130,246,0.55), 0 0 80px rgba(59,130,246,0.22)',
+      duration:320, easing:EB }));
+  ctaBtn.addEventListener('mouseleave', () => {
+    anime({ targets:ctaBtn, scale:1, translateX:0, translateY:0,
+      boxShadow:'0 0 20px rgba(59,130,246,0.25)',
+      duration:480, easing:ES });
+  });
+  ctaBtn.addEventListener('mousedown', () =>
+    anime({ targets:ctaBtn, scale:0.96, duration:100, easing:'easeOutQuad' }));
+  ctaBtn.addEventListener('mouseup', () =>
+    anime({ targets:ctaBtn, scale:1.05, duration:220, easing:EB }));
+}
+</script>
+
+</body>
+</html>

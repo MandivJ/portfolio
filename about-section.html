@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Alex Mercer</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Syne', 'sans-serif'],
+            mono:    ['DM Mono', 'monospace'],
+            body:    ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #050b18;
+      --blue:     #3b82f6;
+      --blue-l:   #60a5fa;
+      --violet:   #8b5cf6;
+      --cyan:     #22d3ee;
+      --glass-bg: rgba(13,28,58,0.52);
+      --glass-bd: rgba(96,165,250,0.13);
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── Grid overlay (same as hero) ── */
+    .grid-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* ── Glass card ── */
+    .glass {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-bd);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .glass-hover {
+      transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
+    }
+    .glass-hover:hover {
+      border-color: rgba(96,165,250,0.28);
+      box-shadow: 0 8px 40px rgba(59,130,246,0.10), 0 0 0 1px rgba(96,165,250,0.1);
+      transform: translateY(-3px);
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(96,165,250,0.6);
+    }
+
+    /* ── Gradient text ── */
+    .grad-text {
+      background: linear-gradient(120deg, #e2e8f0 0%, #93c5fd 35%, #ffffff 55%, #a78bfa 80%, #e2e8f0 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 6s linear infinite;
+    }
+    @keyframes shimmer { from{background-position:-200% center} to{background-position:200% center} }
+
+    /* ── Vertical timeline line ── */
+    .timeline-track {
+      position: absolute;
+      left: 19px;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(96,165,250,0.25) 15%, rgba(96,165,250,0.25) 85%, transparent);
+    }
+    .timeline-dot {
+      position: absolute;
+      left: 12px;
+      width: 15px; height: 15px;
+      border-radius: 50%;
+      border: 1px solid rgba(96,165,250,0.4);
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 2;
+    }
+    .timeline-dot::after {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--blue-l);
+      box-shadow: 0 0 8px rgba(96,165,250,0.8);
+    }
+
+    /* ── Journey item hover ── */
+    .journey-item {
+      transition: all 0.32s ease;
+      cursor: default;
+    }
+    .journey-item:hover .journey-card {
+      border-color: rgba(96,165,250,0.26);
+      box-shadow: 0 4px 30px rgba(59,130,246,0.09);
+    }
+    .journey-item:hover .timeline-dot {
+      border-color: rgba(96,165,250,0.7);
+      box-shadow: 0 0 14px rgba(96,165,250,0.35);
+    }
+    .journey-item:hover .journey-card { transform: translateX(4px); }
+    .journey-card { transition: transform 0.32s ease, border-color 0.32s ease, box-shadow 0.32s ease; }
+
+    /* ── Trait badge hover ── */
+    .trait-badge {
+      background: rgba(59,130,246,0.07);
+      border: 1px solid rgba(96,165,250,0.15);
+      transition: all 0.28s ease;
+      cursor: default;
+    }
+    .trait-badge:hover {
+      background: rgba(59,130,246,0.14);
+      border-color: rgba(96,165,250,0.35);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(59,130,246,0.12);
+    }
+
+    /* ── Education card hover ── */
+    .edu-card {
+      transition: all 0.32s ease;
+    }
+    .edu-card:hover {
+      border-color: rgba(96,165,250,0.3);
+      box-shadow: 0 8px 36px rgba(59,130,246,0.12);
+      transform: translateY(-4px);
+    }
+
+    /* ── Ambient blobs ── */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+    }
+
+    /* ── Entrance states ── */
+    .anim-el   { opacity: 0; }
+    .anim-up   { opacity: 0; transform: translateY(30px); }
+    .anim-left { opacity: 0; transform: translateX(-24px); }
+    .anim-right{ opacity: 0; transform: translateX(24px); }
+
+    /* ── Decorative bracket ── */
+    .bracket-tl { position:absolute; top:16px; left:16px; width:20px; height:20px; border-top:1px solid rgba(96,165,250,0.22); border-left:1px solid rgba(96,165,250,0.22); }
+    .bracket-br { position:absolute; bottom:16px; right:16px; width:20px; height:20px; border-bottom:1px solid rgba(96,165,250,0.22); border-right:1px solid rgba(96,165,250,0.22); }
+
+    /* ── Avatar ring pulse ── */
+    @keyframes ringPulse {
+      0%   { transform:scale(1);   opacity:0.5; }
+      100% { transform:scale(1.5); opacity:0;   }
+    }
+    .avatar-ring {
+      position:absolute; inset:-8px;
+      border-radius:50%;
+      border:1px solid rgba(96,165,250,0.35);
+      animation: ringPulse 2.8s ease-out infinite;
+    }
+    .avatar-ring-2 {
+      position:absolute; inset:-8px;
+      border-radius:50%;
+      border:1px solid rgba(167,139,250,0.25);
+      animation: ringPulse 2.8s ease-out infinite 1.4s;
+    }
+
+    /* ── Scroll reveal tracking line ── */
+    .reveal-line {
+      position:absolute; left:0; top:0; bottom:0; width:2px;
+      background:linear-gradient(to bottom, var(--blue), var(--violet));
+      border-radius:2px;
+      transform-origin:top;
+      transform:scaleY(0);
+    }
+
+    /* ── Hover underline for links ── */
+    .hover-link {
+      color: rgba(96,165,250,0.8);
+      position:relative;
+      text-decoration:none;
+    }
+    .hover-link::after {
+      content:'';
+      position:absolute; bottom:-1px; left:0; right:0;
+      height:1px;
+      background:var(--blue-l);
+      transform:scaleX(0);
+      transform-origin:left;
+      transition:transform 0.3s ease;
+    }
+    .hover-link:hover::after { transform:scaleX(1); }
+  </style>
+</head>
+
+<body class="bg-[#050b18]">
+<section id="about" class="relative overflow-hidden grid-bg py-28 lg:py-36">
+
+  <!-- Ambient blobs -->
+  <div class="blob w-[500px] h-[500px] bg-blue-600/10   top-[-8%]  right-[-6%]" style="animation:none;"></div>
+  <div class="blob w-[380px] h-[380px] bg-violet-600/10 bottom-0   left-[-5%]"  style="animation:none;"></div>
+  <div class="blob w-[260px] h-[260px] bg-cyan-500/7    top-[45%]  right-[20%]" style="animation:none;"></div>
+
+  <div class="relative z-10 max-w-6xl mx-auto px-6 sm:px-10 lg:px-16">
+
+    <!-- ══ SECTION HEADER ══ -->
+    <div class="mb-16 lg:mb-20 anim-el" id="about-header">
+      <div class="flex items-center gap-4 mb-5">
+        <span class="section-label">02 / About</span>
+        <div id="header-line" class="flex-1 h-px bg-gradient-to-r from-blue-500/30 to-transparent"></div>
+      </div>
+      <h2 id="about-heading" class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.08]">
+        <span class="grad-text" style="display:block; opacity:0;">The human</span>
+        <span class="text-slate-300" style="display:block; opacity:0;">behind the code.</span>
+      </h2>
+    </div>
+
+    <!-- ══ TOP ROW: intro + avatar ══ -->
+    <div class="flex flex-col lg:flex-row gap-10 mb-12">
+
+      <!-- Intro card -->
+      <div class="flex-1 glass glass-hover rounded-2xl p-8 relative anim-left" id="intro-card">
+        <div class="bracket-tl"></div>
+        <div class="bracket-br"></div>
+
+        <div class="section-label mb-5">Introduction</div>
+
+        <p class="intro-para font-body text-slate-300 text-base sm:text-lg leading-relaxed mb-5">
+          I'm <span class="text-blue-400 font-semibold">Alex Mercer</span>, a Computer Science student at MIT with a
+          deep passion for building software that sits at the intersection of elegant engineering and
+          thoughtful design. I believe great code should be invisible — what users feel is the experience it creates.
+        </p>
+        <p class="intro-para font-body text-slate-400 text-base leading-relaxed mb-8">
+          When I'm not shipping side projects or contributing to open source, I'm reading about distributed systems,
+          obsessing over typography, or experimenting with generative AI. I approach every problem with curiosity
+          first, pragmatism second.
+        </p>
+
+        <!-- Traits -->
+        <div class="flex flex-wrap gap-2" id="trait-row">
+          <span class="trait-badge font-mono text-xs text-blue-300/80 rounded-lg px-3 py-1.5">Problem Solver</span>
+          <span class="trait-badge font-mono text-xs text-blue-300/80 rounded-lg px-3 py-1.5">Open Source</span>
+          <span class="trait-badge font-mono text-xs text-blue-300/80 rounded-lg px-3 py-1.5">Systems Thinker</span>
+          <span class="trait-badge font-mono text-xs text-blue-300/80 rounded-lg px-3 py-1.5">Design-minded</span>
+          <span class="trait-badge font-mono text-xs text-blue-300/80 rounded-lg px-3 py-1.5">AI Enthusiast</span>
+          <span class="trait-badge font-mono text-xs text-blue-300/80 rounded-lg px-3 py-1.5">Lifelong Learner</span>
+        </div>
+      </div>
+
+      <!-- Avatar / identity card -->
+      <div class="lg:w-72 xl:w-80 shrink-0 anim-right" id="avatar-card">
+        <div class="glass rounded-2xl p-6 relative overflow-hidden h-full flex flex-col gap-6">
+
+          <!-- Decorative inner glow -->
+          <div class="absolute -top-10 -left-10 w-48 h-48 rounded-full pointer-events-none"
+               style="background:radial-gradient(circle, rgba(59,130,246,0.12), transparent 70%);"></div>
+
+          <!-- Avatar -->
+          <div class="flex flex-col items-center gap-4 pt-4">
+            <div class="relative">
+              <div class="avatar-ring"></div>
+              <div class="avatar-ring-2"></div>
+              <div class="w-24 h-24 rounded-full flex items-center justify-center font-display font-bold text-3xl text-white relative z-10"
+                   style="background:linear-gradient(135deg,#3b82f6,#8b5cf6); box-shadow:0 0 32px rgba(59,130,246,0.35);">
+                AM
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="font-display font-bold text-white text-lg leading-tight">Alex Mercer</div>
+              <div class="font-mono text-xs text-blue-400/70 mt-1 tracking-wide">CS @ MIT · Class of 2026</div>
+            </div>
+          </div>
+
+          <!-- Quick info rows -->
+          <div class="space-y-3 text-sm">
+            <div class="info-row flex items-center gap-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                   style="background:rgba(59,130,246,0.12); border:1px solid rgba(96,165,250,0.2);">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <span class="font-body text-slate-400">Cambridge, Massachusetts</span>
+            </div>
+            <div class="info-row flex items-center gap-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                   style="background:rgba(59,130,246,0.12); border:1px solid rgba(96,165,250,0.2);">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+              </div>
+              <span class="font-body text-slate-400">SWE Intern @ <a href="#" class="hover-link">Vercel</a></span>
+            </div>
+            <div class="info-row flex items-center gap-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                   style="background:rgba(59,130,246,0.12); border:1px solid rgba(96,165,250,0.2);">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </div>
+              <span class="font-body text-slate-400">Full-Stack · Systems · AI/ML</span>
+            </div>
+            <div class="info-row flex items-center gap-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                   style="background:rgba(59,130,246,0.12); border:1px solid rgba(96,165,250,0.2);">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <span class="font-body text-slate-400">4+ years coding</span>
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div class="mt-auto rounded-xl px-4 py-3 flex items-center gap-3"
+               style="background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.18);">
+            <span class="w-2 h-2 rounded-full bg-green-400 shrink-0" style="box-shadow:0 0 6px rgba(74,222,128,0.7); animation:statusPulse 2s ease-in-out infinite;"></span>
+            <span class="font-mono text-xs text-green-400/80">Open to internships · Summer 2026</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ BOTTOM ROW: education + journey ══ -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+      <!-- Education -->
+      <div class="anim-up" id="edu-col">
+        <div class="section-label mb-6">Education</div>
+
+        <!-- MIT card -->
+        <div class="glass edu-card rounded-2xl p-6 mb-5 relative overflow-hidden" id="edu-mit">
+          <div class="absolute top-0 right-0 w-32 h-32 rounded-full pointer-events-none"
+               style="background:radial-gradient(circle at 100% 0%, rgba(59,130,246,0.1), transparent 70%);"></div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 font-display font-bold text-sm text-white"
+                 style="background:linear-gradient(135deg,#3b82f6,#6d28d9); box-shadow:0 4px 16px rgba(59,130,246,0.25);">
+              MIT
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2 flex-wrap">
+                <div>
+                  <div class="font-display font-bold text-white text-base leading-tight">Massachusetts Institute of Technology</div>
+                  <div class="font-body text-sm text-slate-400 mt-0.5">B.S. Computer Science</div>
+                </div>
+                <span class="font-mono text-[10px] text-blue-400/70 tracking-wider shrink-0 mt-0.5"
+                      style="background:rgba(59,130,246,0.1); border:1px solid rgba(96,165,250,0.2); border-radius:6px; padding:3px 8px;">
+                  2022 – 2026
+                </span>
+              </div>
+
+              <div class="mt-4 flex flex-wrap gap-2">
+                <span class="font-mono text-[10px] text-slate-400 rounded-md px-2.5 py-1"
+                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">Distributed Systems</span>
+                <span class="font-mono text-[10px] text-slate-400 rounded-md px-2.5 py-1"
+                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">ML / AI</span>
+                <span class="font-mono text-[10px] text-slate-400 rounded-md px-2.5 py-1"
+                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">Algorithms</span>
+                <span class="font-mono text-[10px] text-slate-400 rounded-md px-2.5 py-1"
+                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">Compilers</span>
+              </div>
+
+              <!-- GPA bar -->
+              <div class="mt-4">
+                <div class="flex justify-between items-center mb-1.5">
+                  <span class="font-mono text-[10px] text-slate-600 uppercase tracking-widest">GPA</span>
+                  <span class="font-mono text-xs text-blue-400/80" id="gpa-label">0.0 / 4.0</span>
+                </div>
+                <div class="h-1 rounded-full overflow-hidden" style="background:rgba(51,65,85,0.5);">
+                  <div id="gpa-bar" class="h-full rounded-full"
+                       style="width:0%; background:linear-gradient(to right,#3b82f6,#8b5cf6); box-shadow:0 0 8px rgba(59,130,246,0.5);"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Certifications / extras -->
+        <div class="glass edu-card rounded-2xl p-5 relative overflow-hidden">
+          <div class="section-label mb-4">Certifications & Awards</div>
+          <div class="space-y-3">
+            <div class="cert-item flex items-center gap-3 p-3 rounded-xl transition-all duration-300"
+                 style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06);">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                   style="background:rgba(59,130,246,0.12); border:1px solid rgba(96,165,250,0.2);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+              </div>
+              <div>
+                <div class="font-body text-sm text-slate-300 leading-tight">AWS Solutions Architect — Associate</div>
+                <div class="font-mono text-[10px] text-slate-600 mt-0.5">Amazon Web Services · 2024</div>
+              </div>
+            </div>
+            <div class="cert-item flex items-center gap-3 p-3 rounded-xl transition-all duration-300"
+                 style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06);">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                   style="background:rgba(167,139,250,0.12); border:1px solid rgba(167,139,250,0.2);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <div>
+                <div class="font-body text-sm text-slate-300 leading-tight">HackMIT Grand Prize Winner</div>
+                <div class="font-mono text-[10px] text-slate-600 mt-0.5">MIT Hackathon · Fall 2023</div>
+              </div>
+            </div>
+            <div class="cert-item flex items-center gap-3 p-3 rounded-xl transition-all duration-300"
+                 style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06);">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                   style="background:rgba(34,211,238,0.10); border:1px solid rgba(34,211,238,0.2);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <div>
+                <div class="font-body text-sm text-slate-300 leading-tight">Google Summer of Code Contributor</div>
+                <div class="font-mono text-[10px] text-slate-600 mt-0.5">Open Source · 2023</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Developer Journey timeline -->
+      <div class="anim-up" id="journey-col" style="animation-delay:0.1s;">
+        <div class="section-label mb-6">Developer Journey</div>
+
+        <div class="relative pl-10">
+          <!-- Track line -->
+          <div class="timeline-track"></div>
+
+          <!-- Journey item 1 -->
+          <div class="journey-item relative mb-8" style="padding-top:2px;">
+            <div class="timeline-dot" style="top:4px;"></div>
+            <div class="journey-card glass rounded-xl p-5 ml-2">
+              <div class="flex items-start justify-between gap-2 flex-wrap mb-2">
+                <div class="font-display font-semibold text-white text-sm">First Line of Code</div>
+                <span class="font-mono text-[10px] text-blue-400/60 shrink-0"
+                      style="background:rgba(59,130,246,0.08); border:1px solid rgba(96,165,250,0.15); border-radius:5px; padding:2px 7px;">2018</span>
+              </div>
+              <p class="font-body text-sm text-slate-400 leading-relaxed">
+                Picked up Python at 14, built a Discord bot that blew up to 10k users. That weekend changed everything — I realised code was the closest thing to magic I'd ever find.
+              </p>
+              <div class="mt-3 flex gap-2">
+                <span class="font-mono text-[10px] text-slate-500 rounded px-2 py-0.5"
+                      style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);">Python</span>
+                <span class="font-mono text-[10px] text-slate-500 rounded px-2 py-0.5"
+                      style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);">Discord API</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Journey item 2 -->
+          <div class="journey-item relative mb-8" style="padding-top:2px;">
+            <div class="timeline-dot" style="top:4px;"></div>
+            <div class="journey-card glass rounded-xl p-5 ml-2">
+              <div class="flex items-start justify-between gap-2 flex-wrap mb-2">
+                <div class="font-display font-semibold text-white text-sm">Fell in Love with the Web</div>
+                <span class="font-mono text-[10px] text-blue-400/60 shrink-0"
+                      style="background:rgba(59,130,246,0.08); border:1px solid rgba(96,165,250,0.15); border-radius:5px; padding:2px 7px;">2020</span>
+              </div>
+              <p class="font-body text-sm text-slate-400 leading-relaxed">
+                Discovered React during lockdown. Rebuilt my school's outdated website — teachers noticed. Freelancing followed, then my first real client at $800. Full-stack clicked instantly.
+              </p>
+              <div class="mt-3 flex gap-2">
+                <span class="font-mono text-[10px] text-slate-500 rounded px-2 py-0.5"
+                      style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);">React</span>
+                <span class="font-mono text-[10px] text-slate-500 rounded px-2 py-0.5"
+                      style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);">Node.js</span>
+                <span class="font-mono text-[10px] text-slate-500 rounded px-2 py-0.5"
+                      style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);">Freelance</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Journey item 3 -->
+          <div class="journey-item relative mb-8" style="padding-top:2px;">
+            <div class="timeline-dot" style="top:4px;"></div>
+            <div class="journey-card glass rounded-xl p-5 ml-2">
+              <div class="flex items-start justify-between gap-2 flex-wrap mb-2">
+                <div class="font-display font-semibold text-white text-sm">MIT & Systems Thinking</div>
+                <span class="font-mono text-[10px] text-blue-400/60 shrink-0"
+                      style="background:rgba(59,130,246,0.08); border:1px solid rgba(96,165,250,0.15); border-radius:5px; padding:2px 7px;">2022</span>
+              </div>
+              <p class="font-body text-sm text-slate-400 leading-relaxed">
+                Enrolled at MIT. Algorithms, OS design and distributed systems rewired how I think. Stopped chasing frameworks — started chasing fundamentals. Built a key-value store from scratch in Rust.
+              </p>
+              <div class="mt-3 flex gap-2">
+                <span class="font-mono text-[10px] text-slate-500 rounded px-2 py-0.5"
+                      style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);">Rust</span>
+                <span class="font-mono text-[10px] text-slate-500 rounded px-2 py-0.5"
+                      style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);">Systems</span>
+                <span class="font-mono text-[10px] text-slate-500 rounded px-2 py-0.5"
+                      style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);">C++</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Journey item 4 — current -->
+          <div class="journey-item relative" style="padding-top:2px;">
+            <div class="timeline-dot" style="top:4px; border-color:rgba(96,165,250,0.6); box-shadow:0 0 12px rgba(96,165,250,0.4);"></div>
+            <div class="journey-card rounded-xl p-5 ml-2 relative overflow-hidden"
+                 style="background:rgba(59,130,246,0.06); border:1px solid rgba(96,165,250,0.22);">
+              <div class="absolute top-0 right-0 w-24 h-24 rounded-full pointer-events-none"
+                   style="background:radial-gradient(circle at 100% 0%,rgba(59,130,246,0.14),transparent 70%);"></div>
+              <div class="flex items-start justify-between gap-2 flex-wrap mb-2">
+                <div class="font-display font-semibold text-white text-sm">Building in the AI Era</div>
+                <span class="font-mono text-[10px] text-cyan-400/80 shrink-0 flex items-center gap-1.5"
+                      style="background:rgba(34,211,238,0.08); border:1px solid rgba(34,211,238,0.25); border-radius:5px; padding:2px 7px;">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block" style="box-shadow:0 0 5px rgba(34,211,238,0.7);"></span>
+                  Now
+                </span>
+              </div>
+              <p class="font-body text-sm text-slate-400 leading-relaxed">
+                Interning at Vercel, shipping AI-powered developer tooling. I'm fascinated by where LLMs meet production systems — building things that feel like the future today.
+              </p>
+              <div class="mt-3 flex gap-2 flex-wrap">
+                <span class="font-mono text-[10px] text-blue-400/70 rounded px-2 py-0.5"
+                      style="background:rgba(59,130,246,0.1); border:1px solid rgba(96,165,250,0.2);">LLMs</span>
+                <span class="font-mono text-[10px] text-blue-400/70 rounded px-2 py-0.5"
+                      style="background:rgba(59,130,246,0.1); border:1px solid rgba(96,165,250,0.2);">Next.js</span>
+                <span class="font-mono text-[10px] text-blue-400/70 rounded px-2 py-0.5"
+                      style="background:rgba(59,130,246,0.1); border:1px solid rgba(96,165,250,0.2);">Edge Runtime</span>
+                <span class="font-mono text-[10px] text-blue-400/70 rounded px-2 py-0.5"
+                      style="background:rgba(59,130,246,0.1); border:1px solid rgba(96,165,250,0.2);">Vercel AI SDK</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /container -->
+</section>
+
+<!-- Extra styles for new animation targets -->
+<style>
+  @keyframes statusPulse {
+    0%,100%{ box-shadow:0 0 0 0 rgba(74,222,128,0.5); }
+    50%    { box-shadow:0 0 0 5px rgba(74,222,128,0); }
+  }
+
+  /* Paragraphs start hidden for stagger reveal */
+  .intro-para { opacity: 0; transform: translateY(18px); }
+
+  /* Floating glow orb injected per card */
+  .card-glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(55px);
+    opacity: 0;
+    will-change: transform, opacity;
+    z-index: 0;
+  }
+
+  /* Info rows start hidden */
+  .info-row { opacity: 0; transform: translateX(-14px); }
+
+  /* Cert items start hidden */
+  .cert-item { opacity: 0; transform: translateX(-14px); }
+
+  /* Section header line starts at 0 width */
+  #header-line { width: 0; }
+
+  /* Journey items start hidden */
+  .journey-item { opacity: 0; transform: translateX(-20px); }
+
+  /* Edu cards start hidden */
+  .edu-card { opacity: 0; transform: translateY(22px); }
+
+  /* Timeline track line draws from top */
+  .timeline-track {
+    transform-origin: top;
+    transform: scaleY(0);
+  }
+
+  /* Card hover glow — handled by Anime.js, remove CSS transition conflict */
+  .glass-hover { transition: none !important; }
+  .edu-card    { transition: none !important; }
+</style>
+
+<!-- ══════════════════════════════════════════════════════
+     ANIME.JS — FULL ANIMATION SYSTEM
+══════════════════════════════════════════════════════ -->
+<script>
+/* ─── Shared easing ─── */
+const E  = 'cubicBezier(0.16,1,0.3,1)';
+const ES = 'easeOutElastic(1,0.55)';
+const EB = 'easeOutBack';
+
+/* ─────────────────────────────────────────────────────
+   UTILITY: fire callback once when element enters viewport
+───────────────────────────────────────────────────── */
+function onVisible(el, cb, threshold = 0.12) {
+  if (!el) return;
+  new IntersectionObserver((entries, obs) => {
+    entries.forEach(e => { if (e.isIntersecting) { cb(); obs.disconnect(); } });
+  }, { threshold }).observe(el);
+}
+
+/* ─────────────────────────────────────────────────────
+   UTILITY: inject a floating glow orb inside a card
+   and loop it with Anime.js
+───────────────────────────────────────────────────── */
+function injectGlowOrb(card, color, size, pos) {
+  const orb = document.createElement('div');
+  orb.className = 'card-glow-orb';
+  orb.style.cssText = `
+    width:${size}px; height:${size}px;
+    background:${color};
+    top:${pos.top ?? 'auto'}; bottom:${pos.bottom ?? 'auto'};
+    left:${pos.left ?? 'auto'}; right:${pos.right ?? 'auto'};
+  `;
+  card.style.position = 'relative';
+  card.style.overflow = 'hidden';
+  card.appendChild(orb);
+
+  /* Fade orb in */
+  anime({ targets: orb, opacity: [0, 1], duration: 1200, easing: 'easeOutQuad', delay: 600 });
+
+  /* Loop float */
+  anime({
+    targets: orb,
+    translateX: [0, 18, -10, 0],
+    translateY: [0, -20, 12, 0],
+    scale: [1, 1.15, 0.95, 1],
+    duration: 9000 + Math.random() * 4000,
+    loop: true,
+    direction: 'alternate',
+    easing: 'easeInOutSine',
+  });
+
+  return orb;
+}
+
+/* ═══════════════════════════════════════════════════════
+   1. SECTION HEADER — fade-in + line draw on scroll
+═══════════════════════════════════════════════════════ */
+onVisible(document.getElementById('about-header'), () => {
+  const tl = anime.timeline({ autoplay: true });
+
+  tl.add({
+    targets: '#about-header',
+    opacity: [0, 1], translateY: [32, 0],
+    duration: 750, easing: E,
+  }, 0);
+
+  /* divider line extends right */
+  tl.add({
+    targets: '#header-line',
+    width: ['0%', '100%'],
+    opacity: [0, 1],
+    duration: 900, easing: 'easeOutQuart',
+  }, 300);
+
+  /* heading words stagger — split by <span> */
+  tl.add({
+    targets: '#about-heading span',
+    opacity: [0, 1], translateY: [24, 0],
+    duration: 700, delay: anime.stagger(120),
+    easing: E,
+  }, 200);
+}, 0.05);
+
+
+/* ═══════════════════════════════════════════════════════
+   2. INTRO CARD — slide in + paragraph stagger reveal
+═══════════════════════════════════════════════════════ */
+onVisible(document.getElementById('intro-card'), () => {
+  const tl = anime.timeline({ autoplay: true });
+
+  /* Card slides in from left */
+  tl.add({
+    targets: '#intro-card',
+    opacity: [0, 1], translateX: [-36, 0],
+    duration: 800, easing: E,
+  }, 0);
+
+  /* Paragraphs stagger up */
+  tl.add({
+    targets: '#intro-card .intro-para',
+    opacity: [0, 1], translateY: [20, 0],
+    duration: 600, delay: anime.stagger(130),
+    easing: E,
+  }, 300);
+
+  /* Trait badges cascade */
+  tl.add({
+    targets: '#trait-row .trait-badge',
+    opacity: [0, 1], translateY: [12, 0], scale: [0.85, 1],
+    duration: 420, delay: anime.stagger(52),
+    easing: E,
+  }, 620);
+
+  /* Inject floating glow orb into intro card */
+  injectGlowOrb(
+    document.getElementById('intro-card'),
+    'radial-gradient(circle, rgba(59,130,246,0.18), transparent 70%)',
+    260, { bottom: '-60px', right: '-60px' }
+  );
+}, 0.1);
+
+
+/* ═══════════════════════════════════════════════════════
+   3. AVATAR CARD — slide from right + info rows stagger
+═══════════════════════════════════════════════════════ */
+onVisible(document.getElementById('avatar-card'), () => {
+  const tl = anime.timeline({ autoplay: true });
+
+  tl.add({
+    targets: '#avatar-card',
+    opacity: [0, 1], translateX: [36, 0],
+    duration: 800, easing: E,
+  }, 0);
+
+  /* Avatar scales in with spring */
+  tl.add({
+    targets: '#avatar-card .relative',
+    scale: [0.7, 1], opacity: [0, 1],
+    duration: 700, easing: EB,
+  }, 250);
+
+  /* Info rows slide in staggered */
+  tl.add({
+    targets: '#avatar-card .info-row',
+    opacity: [0, 1], translateX: [-14, 0],
+    duration: 460, delay: anime.stagger(80),
+    easing: E,
+  }, 480);
+
+  /* Status chip fades last */
+  tl.add({
+    targets: '#avatar-card .mt-auto',
+    opacity: [0, 1], translateY: [8, 0],
+    duration: 500, easing: E,
+  }, 820);
+
+  /* Floating glow orb — violet tint in avatar card */
+  injectGlowOrb(
+    document.querySelector('#avatar-card .glass'),
+    'radial-gradient(circle, rgba(139,92,246,0.2), transparent 70%)',
+    200, { top: '-40px', left: '-40px' }
+  );
+
+  /* Avatar idle float */
+  setTimeout(() => {
+    anime({
+      targets: '#avatar-card .relative',
+      translateY: [-5, 5],
+      duration: 3400,
+      loop: true,
+      direction: 'alternate',
+      easing: 'easeInOutSine',
+    });
+  }, 900);
+}, 0.1);
+
+
+/* ═══════════════════════════════════════════════════════
+   4. EDUCATION COLUMN — cards stagger up + GPA bar
+═══════════════════════════════════════════════════════ */
+onVisible(document.getElementById('edu-col'), () => {
+  /* Edu cards stagger */
+  anime({
+    targets: '#edu-col .edu-card',
+    opacity: [0, 1], translateY: [28, 0],
+    duration: 680, delay: anime.stagger(140),
+    easing: E,
+  });
+
+  /* Cert items stagger with slide */
+  anime({
+    targets: '#edu-col .cert-item',
+    opacity: [0, 1], translateX: [-14, 0],
+    duration: 460, delay: anime.stagger(95, { start: 400 }),
+    easing: E,
+  });
+
+  /* Inject glow orb into MIT card */
+  setTimeout(() => {
+    injectGlowOrb(
+      document.getElementById('edu-mit'),
+      'radial-gradient(circle, rgba(59,130,246,0.15), transparent 65%)',
+      180, { top: '-30px', right: '-30px' }
+    );
+  }, 300);
+}, 0.1);
+
+
+/* ═══════════════════════════════════════════════════════
+   5. GPA BAR — counter + fill when MIT card visible
+═══════════════════════════════════════════════════════ */
+onVisible(document.getElementById('edu-mit'), () => {
+  anime({
+    targets: '#gpa-bar',
+    width: ['0%', '97.5%'],
+    duration: 1300, easing: 'easeOutQuart', delay: 500,
+  });
+  anime({
+    targets: { v: 0 }, v: 3.9,
+    duration: 1300, easing: 'easeOutQuart', delay: 500,
+    update(a) {
+      const v = a.animations[0].currentValue;
+      document.getElementById('gpa-label').textContent = v.toFixed(1) + ' / 4.0';
+    },
+    complete() { document.getElementById('gpa-label').textContent = '3.9 / 4.0'; }
+  });
+}, 0.4);
+
+
+/* ═══════════════════════════════════════════════════════
+   6. JOURNEY TIMELINE — track line draw + item cascade
+═══════════════════════════════════════════════════════ */
+onVisible(document.getElementById('journey-col'), () => {
+  const tl = anime.timeline({ autoplay: true });
+
+  /* Timeline vertical track draws downward */
+  tl.add({
+    targets: '.timeline-track',
+    scaleY: [0, 1],
+    duration: 900, easing: 'easeOutQuart',
+  }, 0);
+
+  /* Journey items cascade from left, each dot pops in */
+  tl.add({
+    targets: '.journey-item',
+    opacity: [0, 1], translateX: [-22, 0],
+    duration: 560, delay: anime.stagger(150),
+    easing: E,
+  }, 250);
+
+  /* Current "Now" card gets extra glow inject */
+  setTimeout(() => {
+    const nowCard = document.querySelector('.journey-item:last-child .journey-card');
+    if (nowCard) injectGlowOrb(
+      nowCard,
+      'radial-gradient(circle, rgba(34,211,238,0.15), transparent 65%)',
+      140, { bottom: '-20px', right: '-20px' }
+    );
+  }, 1200);
+}, 0.08);
+
+
+/* ═══════════════════════════════════════════════════════
+   7. BACKGROUND BLOB FLOAT LOOPS
+═══════════════════════════════════════════════════════ */
+const blobCfg = [
+  { tx: 42, ty: -30, sc: 1.07, dur: 13500, delay: 0    },
+  { tx:-34, ty:  24, sc: 1.08, dur:  9600, delay: 2200 },
+  { tx: 22, ty: -18, sc: 1.05, dur:  8400, delay: 4400 },
+];
+document.querySelectorAll('.blob').forEach((b, i) => {
+  const c = blobCfg[i] || blobCfg[0];
+  anime({
+    targets: b,
+    translateX: [0, c.tx, -c.tx * 0.45, 0],
+    translateY: [0, c.ty, -c.ty * 0.55, 0],
+    scale: [1, c.sc, 0.96, 1],
+    duration: c.dur, delay: c.delay,
+    loop: true, direction: 'alternate',
+    easing: 'easeInOutSine',
+  });
+});
+
+
+/* ═══════════════════════════════════════════════════════
+   8. CARD HOVER — Anime.js glow box-shadow + lift
+═══════════════════════════════════════════════════════ */
+function addCardHover(selector, glowColor) {
+  document.querySelectorAll(selector).forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      anime({
+        targets: card,
+        translateY: -5,
+        boxShadow: [`0 2px 12px rgba(0,0,0,0.2)`, `0 12px 44px ${glowColor}, 0 0 0 1px rgba(96,165,250,0.18)`],
+        borderColor: 'rgba(96,165,250,0.32)',
+        duration: 340, easing: EB,
+      });
+    });
+    card.addEventListener('mouseleave', () => {
+      anime({
+        targets: card,
+        translateY: 0,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.2)',
+        borderColor: 'rgba(96,165,250,0.13)',
+        duration: 500, easing: ES,
+      });
+    });
+  });
+}
+
+addCardHover('#intro-card',        'rgba(59,130,246,0.14)');
+addCardHover('#edu-col .edu-card', 'rgba(59,130,246,0.13)');
+
+
+/* ═══════════════════════════════════════════════════════
+   9. TRAIT BADGE HOVER — spring lift + glow
+═══════════════════════════════════════════════════════ */
+document.querySelectorAll('.trait-badge').forEach(badge => {
+  badge.addEventListener('mouseenter', () =>
+    anime({ targets: badge, translateY: -4, scale: 1.08,
+      boxShadow: '0 6px 22px rgba(59,130,246,0.2)',
+      duration: 260, easing: EB }));
+  badge.addEventListener('mouseleave', () =>
+    anime({ targets: badge, translateY: 0, scale: 1,
+      boxShadow: '0 0px 0px rgba(0,0,0,0)',
+      duration: 400, easing: ES }));
+});
+
+
+/* ═══════════════════════════════════════════════════════
+   10. CERT ITEM HOVER — slide + background glow
+═══════════════════════════════════════════════════════ */
+document.querySelectorAll('.cert-item').forEach(el => {
+  el.addEventListener('mouseenter', () =>
+    anime({ targets: el, translateX: 6,
+      boxShadow: '4px 0 20px rgba(59,130,246,0.12)',
+      duration: 280, easing: EB }));
+  el.addEventListener('mouseleave', () =>
+    anime({ targets: el, translateX: 0,
+      boxShadow: '0 0 0 rgba(0,0,0,0)',
+      duration: 420, easing: ES }));
+});
+
+
+/* ═══════════════════════════════════════════════════════
+   11. JOURNEY ITEM HOVER — dot pulse + card glow
+═══════════════════════════════════════════════════════ */
+document.querySelectorAll('.journey-item').forEach(item => {
+  const dot  = item.querySelector('.timeline-dot');
+  const card = item.querySelector('.journey-card');
+
+  item.addEventListener('mouseenter', () => {
+    anime({ targets: dot,  scale: 1.35,
+      boxShadow: '0 0 18px rgba(96,165,250,0.6)',
+      duration: 280, easing: EB });
+    anime({ targets: card, translateX: 5,
+      boxShadow: '0 6px 28px rgba(59,130,246,0.12)',
+      duration: 300, easing: EB });
+  });
+  item.addEventListener('mouseleave', () => {
+    anime({ targets: dot,  scale: 1,
+      boxShadow: '0 0 0px rgba(96,165,250,0)',
+      duration: 460, easing: ES });
+    anime({ targets: card, translateX: 0,
+      boxShadow: '0 0 0px rgba(59,130,246,0)',
+      duration: 460, easing: ES });
+  });
+});
+
+
+/* ═══════════════════════════════════════════════════════
+   12. AVATAR CARD — icon row hover spring
+═══════════════════════════════════════════════════════ */
+document.querySelectorAll('#avatar-card .info-row').forEach(row => {
+  row.addEventListener('mouseenter', () =>
+    anime({ targets: row, translateX: 4, duration: 240, easing: EB }));
+  row.addEventListener('mouseleave', () =>
+    anime({ targets: row, translateX: 0, duration: 380, easing: ES }));
+});
+</script>
+
+</body>
+</html>
