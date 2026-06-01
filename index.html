@@ -3,14 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Alex Mercer — Portfolio</title>
-  <meta name="description" content="Alex Mercer — Software Engineering Student. I build elegant, performant software from beautiful UIs to robust backends." />
+  <title>Mandiv Jayakody — Portfolio</title>
+  <meta name="description" content="Mandiv Jayakody — Software Engineering Top-Up Student. I build elegant, performant software from beautiful UIs to robust backends." />
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Anime.js v3 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <script>
+    (function () {
+      if (window.anime) return;
+
+      document.documentElement.classList.add('no-anime');
+
+      const noopAnimation = {
+        pause() {},
+        play() {},
+        restart() {},
+        finished: Promise.resolve()
+      };
+
+      function fallbackAnime(config) {
+        if (config && typeof config.complete === 'function') {
+          setTimeout(() => config.complete(noopAnimation), 0);
+        }
+        return noopAnimation;
+      }
+
+      fallbackAnime.timeline = function () {
+        return {
+          add() { return this; },
+          pause() {},
+          play() {},
+          restart() {},
+          finished: Promise.resolve()
+        };
+      };
+      fallbackAnime.stagger = function () { return 0; };
+      fallbackAnime.remove = function () {};
+
+      window.anime = fallbackAnime;
+    })();
+  </script>
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -349,7 +384,7 @@
     }
     @keyframes scrollPulse { 0%,100%{opacity:0.45} 50%{opacity:1} }
 
-    #word-alex, #word-mercer { display:block; opacity:0; transform:translateY(44px); }
+    #word-mandiv, #word-jayakody { display:block; opacity:0; transform:translateY(44px); }
     .activity-item { opacity:0; transform:translateX(-14px); }
 
     /* ═══════════════════════════════════════════
@@ -634,6 +669,60 @@
     /* Scroll offset for fixed navbar */
     section { scroll-margin-top: 80px; }
     #hero { scroll-margin-top: 0; }
+
+    html.no-anime .anim-el,
+    html.no-anime .anim-left,
+    html.no-anime .anim-right,
+    html.no-anime .anim-up,
+    html.no-anime #word-mandiv,
+    html.no-anime #word-jayakody,
+    html.no-anime .activity-item,
+    html.no-anime #about-header,
+    html.no-anime #about-heading span,
+    html.no-anime #intro-card,
+    html.no-anime #intro-card .intro-para,
+    html.no-anime #trait-row .trait-badge,
+    html.no-anime #avatar-card,
+    html.no-anime #avatar-card .relative,
+    html.no-anime #about .info-row,
+    html.no-anime #about .cert-item,
+    html.no-anime #about .edu-card,
+    html.no-anime .timeline-track,
+    html.no-anime .journey-item,
+    html.no-anime #skills-header,
+    html.no-anime #skills-heading span,
+    html.no-anime #skills-sub,
+    html.no-anime #cat-tabs,
+    html.no-anime .skill-card,
+    html.no-anime #skills .bracket-tl,
+    html.no-anime #skills .bracket-br,
+    html.no-anime .skill-card .skill-icon-wrap,
+    html.no-anime .skill-card .mb-4,
+    html.no-anime .skill-card .pt-3,
+    html.no-anime .skill-card .skill-tag,
+    html.no-anime .stat-chip,
+    html.no-anime #proj-header,
+    html.no-anime #proj-heading span,
+    html.no-anime #proj-sub,
+    html.no-anime .filter-tab,
+    html.no-anime .project-card,
+    html.no-anime .proj-num,
+    html.no-anime .proj-icon,
+    html.no-anime .proj-title,
+    html.no-anime .proj-desc,
+    html.no-anime .tech-pill,
+    html.no-anime .card-actions,
+    html.no-anime #proj-cta,
+    html.no-anime #contact-header,
+    html.no-anime #contact-sub,
+    html.no-anime #contact-heading span,
+    html.no-anime .form-glass,
+    html.no-anime .contact-right,
+    html.no-anime #submit-row,
+    html.no-anime #footer-bar {
+      opacity: 1 !important;
+      transform: none !important;
+    }
     </style>
   </head>
 
@@ -642,7 +731,7 @@
   <!-- NAVBAR -->
   <nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 px-6 sm:px-10 lg:px-16">
     <div class="max-w-6xl mx-auto flex items-center justify-between h-16">
-      <a href="#hero" class="nav-logo">AM</a>
+      <a href="#hero" class="nav-logo">MJ</a>
       <div class="nav-links-desktop flex items-center gap-8">
         <a href="#hero" class="nav-link active" data-section="hero">Home</a>
         <a href="#about" class="nav-link" data-section="about">About</a>
@@ -706,8 +795,8 @@
         <!-- Hero name -->
         <div id="el-name">
           <h1 class="font-display font-extrabold leading-[1.05] tracking-tight">
-            <span id="word-alex"   class="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl name-shimmer">Alex</span>
-            <span id="word-mercer" class="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl name-shimmer">Mercer.</span>
+            <span id="word-mandiv"   class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl name-shimmer">Mandiv</span>
+            <span id="word-jayakody" class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl name-shimmer">Jayakody.</span>
           </h1>
         </div>
 
@@ -715,7 +804,7 @@
         <div class="anim-el" id="el-sub">
           <p class="font-body text-base sm:text-lg text-slate-400 leading-relaxed max-w-lg">
             I build elegant, performant software — from beautiful UIs to
-            robust backends. Currently studying CS at <span class="text-blue-400">MIT</span>,
+            robust backends. Currently studying Software Engineering Top-Up at <span class="text-blue-400">Java Institute</span>,
             obsessed with turning ideas into products.
           </p>
         </div>
@@ -772,12 +861,12 @@
           <!-- Avatar + name -->
           <div class="flex items-center gap-4 mb-6">
             <div class="relative">
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center font-display font-bold text-xl text-white" style="box-shadow:0 4px 24px rgba(59,130,246,0.3);">AM</div>
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center font-display font-bold text-xl text-white" style="box-shadow:0 4px 24px rgba(59,130,246,0.3);">MJ</div>
               <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-cyan-400 rounded-full border-2 border-[#050b18] status-dot"></div>
             </div>
             <div>
-              <div class="font-display font-bold text-white text-base leading-tight">Alex Mercer</div>
-              <div class="font-mono text-xs text-blue-400/70 mt-0.5 tracking-wide">@alexmercer.dev</div>
+              <div class="font-display font-bold text-white text-base leading-tight">Mandiv Jayakody</div>
+              <div class="font-mono text-xs text-blue-400/70 mt-0.5 tracking-wide">@mandivjayakody.dev</div>
             </div>
           </div>
 
@@ -884,7 +973,7 @@
         <div class="section-label mb-5">Introduction</div>
 
         <p class="intro-para font-body text-slate-300 text-base sm:text-lg leading-relaxed mb-5">
-          I'm <span class="text-blue-400 font-semibold">Alex Mercer</span>, a Computer Science student at MIT with a
+          I'm <span class="text-blue-400 font-semibold">Mandiv Jayakody</span>, a Software Engineering Top-Up student at Java Institute with a
           deep passion for building software that sits at the intersection of elegant engineering and
           thoughtful design. I believe great code should be invisible — what users feel is the experience it creates.
         </p>
@@ -920,12 +1009,12 @@
               <div class="avatar-ring-2"></div>
               <div class="w-24 h-24 rounded-full flex items-center justify-center font-display font-bold text-3xl text-white relative z-10"
                    style="background:linear-gradient(135deg,#3b82f6,#8b5cf6); box-shadow:0 0 32px rgba(59,130,246,0.35);">
-                AM
+                MJ
               </div>
             </div>
             <div class="text-center">
-              <div class="font-display font-bold text-white text-lg leading-tight">Alex Mercer</div>
-              <div class="font-mono text-xs text-blue-400/70 mt-1 tracking-wide">CS @ MIT · Class of 2026</div>
+              <div class="font-display font-bold text-white text-lg leading-tight">Mandiv Jayakody</div>
+              <div class="font-mono text-xs text-blue-400/70 mt-1 tracking-wide">Software Engineering Top-Up - Java Institute</div>
             </div>
           </div>
 
@@ -979,37 +1068,37 @@
       <div class="anim-up" id="edu-col">
         <div class="section-label mb-6">Education</div>
 
-        <!-- MIT card -->
-        <div class="glass edu-card rounded-2xl p-6 mb-5 relative overflow-hidden" id="edu-mit">
+        <!-- Java Institute card -->
+        <div class="glass edu-card rounded-2xl p-6 mb-5 relative overflow-hidden" id="edu-java">
           <div class="absolute top-0 right-0 w-32 h-32 rounded-full pointer-events-none"
                style="background:radial-gradient(circle at 100% 0%, rgba(59,130,246,0.1), transparent 70%);"></div>
 
           <div class="flex items-start gap-4">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 font-display font-bold text-sm text-white"
                  style="background:linear-gradient(135deg,#3b82f6,#6d28d9); box-shadow:0 4px 16px rgba(59,130,246,0.25);">
-              MIT
+              JI
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-start justify-between gap-2 flex-wrap">
                 <div>
-                  <div class="font-display font-bold text-white text-base leading-tight">Massachusetts Institute of Technology</div>
-                  <div class="font-body text-sm text-slate-400 mt-0.5">B.S. Computer Science</div>
+                  <div class="font-display font-bold text-white text-base leading-tight">Java Institute</div>
+                  <div class="font-body text-sm text-slate-400 mt-0.5">Software Engineering Top-Up</div>
                 </div>
                 <span class="font-mono text-[10px] text-blue-400/70 tracking-wider shrink-0 mt-0.5"
                       style="background:rgba(59,130,246,0.1); border:1px solid rgba(96,165,250,0.2); border-radius:6px; padding:3px 8px;">
-                  2022 – 2026
+                  Current
                 </span>
               </div>
 
               <div class="mt-4 flex flex-wrap gap-2">
                 <span class="font-mono text-[10px] text-slate-400 rounded-md px-2.5 py-1"
-                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">Distributed Systems</span>
+                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">Software Design</span>
                 <span class="font-mono text-[10px] text-slate-400 rounded-md px-2.5 py-1"
-                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">ML / AI</span>
+                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">Java</span>
                 <span class="font-mono text-[10px] text-slate-400 rounded-md px-2.5 py-1"
-                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">Algorithms</span>
+                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">Web Development</span>
                 <span class="font-mono text-[10px] text-slate-400 rounded-md px-2.5 py-1"
-                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">Compilers</span>
+                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">Databases</span>
               </div>
 
               <!-- GPA bar -->
@@ -1049,8 +1138,8 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               </div>
               <div>
-                <div class="font-body text-sm text-slate-300 leading-tight">HackMIT Grand Prize Winner</div>
-                <div class="font-mono text-[10px] text-slate-600 mt-0.5">MIT Hackathon · Fall 2023</div>
+                <div class="font-body text-sm text-slate-300 leading-tight">Hackathon Project Winner</div>
+                <div class="font-mono text-[10px] text-slate-600 mt-0.5">Student Hackathon - 2023</div>
               </div>
             </div>
             <div class="cert-item flex items-center gap-3 p-3 rounded-xl transition-all duration-300"
@@ -1125,12 +1214,12 @@
             <div class="timeline-dot" style="top:4px;"></div>
             <div class="journey-card glass rounded-xl p-5 ml-2">
               <div class="flex items-start justify-between gap-2 flex-wrap mb-2">
-                <div class="font-display font-semibold text-white text-sm">MIT & Systems Thinking</div>
+                <div class="font-display font-semibold text-white text-sm">Java Institute & Software Engineering</div>
                 <span class="font-mono text-[10px] text-blue-400/60 shrink-0"
                       style="background:rgba(59,130,246,0.08); border:1px solid rgba(96,165,250,0.15); border-radius:5px; padding:2px 7px;">2022</span>
               </div>
               <p class="font-body text-sm text-slate-400 leading-relaxed">
-                Enrolled at MIT. Algorithms, OS design and distributed systems rewired how I think. Stopped chasing frameworks — started chasing fundamentals. Built a key-value store from scratch in Rust.
+                Started the Software Engineering Top-Up at Java Institute, strengthening my foundation in software design, application development, databases, and production-minded engineering.
               </p>
               <div class="mt-3 flex gap-2">
                 <span class="font-mono text-[10px] text-slate-500 rounded px-2 py-0.5"
@@ -1951,7 +2040,7 @@
           <div class="section-label mb-5">Direct contact</div>
 
           <!-- Email -->
-          <a href="mailto:alex@mercer.dev" class="info-chip mb-3" style="display:flex; text-decoration:none;">
+          <a href="mailto:mandiv@jayakody.dev" class="info-chip mb-3" style="display:flex; text-decoration:none;">
             <div class="info-chip-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -1960,7 +2049,7 @@
             </div>
             <div>
               <div class="font-mono text-[10px] text-slate-600 uppercase tracking-widest mb-0.5">Email</div>
-              <div class="font-body text-sm text-blue-400">alex@mercer.dev</div>
+              <div class="font-body text-sm text-blue-400">mandiv@jayakody.dev</div>
             </div>
           </a>
 
@@ -1991,7 +2080,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <div class="font-display font-semibold text-white text-sm">GitHub</div>
-                <div class="font-mono text-[10px] text-slate-500 mt-0.5">@alexmercer</div>
+                <div class="font-mono text-[10px] text-slate-500 mt-0.5">@mandivjayakody</div>
               </div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             </a>
@@ -2003,7 +2092,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <div class="font-display font-semibold text-white text-sm">LinkedIn</div>
-                <div class="font-mono text-[10px] text-slate-500 mt-0.5">Alex Mercer</div>
+                <div class="font-mono text-[10px] text-slate-500 mt-0.5">Mandiv Jayakody</div>
               </div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             </a>
@@ -2015,7 +2104,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <div class="font-display font-semibold text-white text-sm">X (Twitter)</div>
-                <div class="font-mono text-[10px] text-slate-500 mt-0.5">@alexmercer_dev</div>
+                <div class="font-mono text-[10px] text-slate-500 mt-0.5">@mandivjayakody_dev</div>
               </div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             </a>
@@ -2027,7 +2116,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <div class="font-display font-semibold text-white text-sm">Dev.to</div>
-                <div class="font-mono text-[10px] text-slate-500 mt-0.5">@alexmercer</div>
+                <div class="font-mono text-[10px] text-slate-500 mt-0.5">@mandivjayakody</div>
               </div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             </a>
@@ -2054,7 +2143,7 @@
       <div class="footer-divider mb-8"></div>
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div class="font-mono text-xs text-slate-600 tracking-widest">
-          © 2025 Alex Mercer · Built with HTML, Tailwind & Anime.js
+          © 2025 Mandiv Jayakody · Built with HTML, Tailwind & Anime.js
         </div>
         <div class="flex items-center gap-6">
           <a href="#" class="font-mono text-xs text-slate-600 hover:text-blue-400 transition-colors tracking-wider">Privacy</a>
@@ -2191,7 +2280,7 @@ master.add({
 
 /* Hero name — word-by-word stagger */
 master.add({
-  targets:['#word-alex','#word-mercer'],
+  targets:['#word-mandiv','#word-jayakody'],
   opacity:[0,1], translateY:[52,0],
   duration:880, delay:anime.stagger(130),
   easing:E
@@ -2594,6 +2683,12 @@ onVisible(document.getElementById('avatar-card'), () => {
    4. EDUCATION COLUMN — cards stagger up + GPA bar
 ═══════════════════════════════════════════════════════ */
 onVisible(document.getElementById('edu-col'), () => {
+  anime({
+    targets: '#edu-col',
+    opacity: [0, 1], translateY: [30, 0],
+    duration: 620, easing: E,
+  });
+
   /* Edu cards stagger */
   anime({
     targets: '#edu-col .edu-card',
@@ -2610,10 +2705,10 @@ onVisible(document.getElementById('edu-col'), () => {
     easing: E,
   });
 
-  /* Inject glow orb into MIT card */
+  /* Inject glow orb into Java Institute card */
   setTimeout(() => {
     injectGlowOrb(
-      document.getElementById('edu-mit'),
+      document.getElementById('edu-java'),
       'radial-gradient(circle, rgba(59,130,246,0.15), transparent 65%)',
       180, { top: '-30px', right: '-30px' }
     );
@@ -2622,9 +2717,9 @@ onVisible(document.getElementById('edu-col'), () => {
 
 
 /* ═══════════════════════════════════════════════════════
-   5. GPA BAR — counter + fill when MIT card visible
+   5. GPA BAR — counter + fill when education card visible
 ═══════════════════════════════════════════════════════ */
-onVisible(document.getElementById('edu-mit'), () => {
+onVisible(document.getElementById('edu-java'), () => {
   anime({
     targets: '#gpa-bar',
     width: ['0%', '97.5%'],
@@ -2647,6 +2742,12 @@ onVisible(document.getElementById('edu-mit'), () => {
 ═══════════════════════════════════════════════════════ */
 onVisible(document.getElementById('journey-col'), () => {
   const tl = anime.timeline({ autoplay: true });
+
+  tl.add({
+    targets: '#journey-col',
+    opacity: [0, 1], translateY: [30, 0],
+    duration: 620, easing: E,
+  }, 0);
 
   /* Timeline vertical track draws downward */
   tl.add({
